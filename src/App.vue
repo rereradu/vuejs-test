@@ -1,32 +1,78 @@
 <template>
-  <div id="app">
-    <div id="nav">
-      <router-link to="/">Home</router-link> |
-      <router-link to="/about">About</router-link>
-    </div>
-    <router-view />
-  </div>
+  <v-app>
+    <v-app-bar app color="primary" dark>
+      <div class="d-flex align-center">
+        VueJS Todo Test (with Vuetify)
+      </div>
+      <template v-slot:extension>
+        <v-btn
+          fab
+          color="green"
+          bottom
+          left
+          absolute
+          @click="toggleAddNewTodoDialog"
+          title="Click to add new Todo"
+        >
+          <v-icon>mdi-plus</v-icon>
+        </v-btn>
+      </template>
+    </v-app-bar>
+
+    <v-main>
+      <todo-list :todos="todos"></todo-list>
+      <add-todo
+        :openAddNewTodoDialog="openAddNewTodoDialog"
+        @addTodo="addTodo"
+        @update:openAddNewTodoDialog="openAddNewTodoDialog = $event"
+      ></add-todo>
+    </v-main>
+  </v-app>
 </template>
 
-<style lang="scss">
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-}
+<script lang="ts">
+import { Component, Vue } from "vue-property-decorator";
 
-#nav {
-  padding: 30px;
+import Todo from "@/models/todo";
+import todoApi from "@/components/todos/todosApi";
+import TodoList from "@/components/todos/TodoList.vue";
+import AddTodo from "@/components/todos/AddTodo.vue";
 
-  a {
-    font-weight: bold;
-    color: #2c3e50;
+@Component({
+  components: {
+    TodoList,
+    AddTodo
+  }
+})
+export default class App extends Vue {
+  todos: Todo[];
+  openAddNewTodoDialog: boolean;
 
-    &.router-link-exact-active {
-      color: #42b983;
-    }
+  public constructor() {
+    super();
+    this.todos = [];
+    this.openAddNewTodoDialog = false;
+  }
+
+  public mounted() {
+    this.getTodos();
+  }
+
+  public getTodos() {
+    todoApi.getTodos().then(result => {
+      this.todos = result;
+    });
+  }
+
+  public addTodo(newTodo: string) {
+    todoApi.addTodo(newTodo).then(result => {
+      this.todos = [result, ...this.todos];
+      this.openAddNewTodoDialog = false;
+    });
+  }
+
+  public toggleAddNewTodoDialog() {
+    this.openAddNewTodoDialog = !this.openAddNewTodoDialog;
   }
 }
-</style>
+</script>
