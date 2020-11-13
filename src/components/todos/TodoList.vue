@@ -15,19 +15,18 @@
         v-for="(todo, i) in todoList"
         :key="`todo-${i}`"
         class="mx-auto pa-3 ma-2 todo-card"
-        max-width="800"
+        max-width="600"
       >
-        <v-row>
-          <v-col cols="8">
-            <v-card-title
-              :class="[
-                'headline mb-1',
-                todo.completed ? 'text-decoration-line-through' : ''
-              ]"
-              >{{ todo.title }}</v-card-title
-            >
-          </v-col>
-          <v-col cols="2" class="text-center">
+        <v-card-title
+          :class="[
+            'headline mb-1',
+            todo.completed ? 'text-decoration-line-through' : ''
+          ]"
+          >{{ todo.title }}</v-card-title
+        >
+
+        <v-card-actions>
+          <v-row align="center" justify="space-around">
             <v-btn icon color="green" @click="updateTodo(todo)">
               <v-icon v-if="todo.completed" title="Click to reset Todo"
                 >mdi-undo</v-icon
@@ -43,8 +42,7 @@
                 color="primary"
               ></v-progress-circular>
             </v-btn>
-          </v-col>
-          <v-col cols="2" class="text-center">
+
             <v-btn icon color="red" @click="deleteTodo(todo, i)">
               <v-icon
                 v-if="deleting !== todo.id"
@@ -57,8 +55,8 @@
                 color="primary"
               ></v-progress-circular>
             </v-btn>
-          </v-col>
-        </v-row>
+          </v-row>
+        </v-card-actions>
       </v-card>
     </transition-group>
     <v-row v-else class="d-flex justify-center">
@@ -112,7 +110,9 @@ export default class TodoList extends Vue {
 
   private get todoList(): Todo[] {
     if (this.filter.length > 0) {
-      return this.todos.filter(todo => todo.title.indexOf(this.filter) >= 0);
+      return this.todos.filter(
+        todo => todo.title.indexOf(this.filter.toLowerCase()) >= 0
+      );
     }
     return [...this.todos];
   }
